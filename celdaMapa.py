@@ -17,10 +17,13 @@ class CeldaMapa(Agent):
         self.contenido = contenido
 
     def stage_1(self):
+        # Clase únicamente se usa para crear celdas, no es necesario implementar
         pass
 
     def stage_2(self):
+        # Clase únicamente se usa para crear celdas, no es necesario implementar
         pass
 
     def stage_3(self):
+        # Clase únicamente se usa para crear celdas, no es necesario implementar
         pass
