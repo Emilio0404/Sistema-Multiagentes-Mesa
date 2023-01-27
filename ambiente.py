@@ -7,6 +7,7 @@ from random import choice
 from carro import Carro
 from persona import Persona
 from mapaTec import MapaTec
+from autobus import Autobus
 
 
 class Ambiente(Model):
@@ -19,6 +20,7 @@ class Ambiente(Model):
     self.grid = MapaTec(self.schedule, self)
     self.crear_carros()
     self.crear_personas()
+    self.crear_autobus()
 
 
   def step(self):
@@ -40,10 +42,15 @@ class Ambiente(Model):
       tmpAgent = Persona("Persona" + str(i), self, horarios[0], horarios[1], choice(self.grid.casas))
       self.schedule.add(tmpAgent)
 
+  
+  def crear_autobus(self):
+      tmpAgent = Autobus("Autobus" + str(1), self)
+      self.schedule.add(tmpAgent)
+
 
   def generar_horarios_movimiento(self):
     horaDeIda = randint(7 * 4, 19 * 4)
-    horaDeRegreso = randint(horaDeIda + 1, 21 * 4)
+    horaDeRegreso = randint(horaDeIda + 1, 21 * 4) # Sumar uno para evitar generar misma hora de ida y regreso
     return [horaDeIda, horaDeRegreso]
 
 

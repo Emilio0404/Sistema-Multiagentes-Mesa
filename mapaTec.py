@@ -5,7 +5,6 @@ from enum import Enum
 class MapaTec():
     MAP_WIDTH = 20
     MAP_HEIGHT = 22
-    entidades_ciudad = Enum("Entidades_Ciudad", ["inhabitable", "calle", "casa", "estacion_camion", "edificio-residencia", "tec"])
     casas = [
             (1, 0), (6, 0), (7, 0), (14, 0), (20, 0), (1, 3),
             (2, 3), (7, 3), (20, 3), (13, 12), (16, 12), (16, 15),
@@ -14,6 +13,9 @@ class MapaTec():
     edificios = [
             (17, 6), (19, 6), (21, 12), (21, 15)
         ]
+    coordenadasTec = (1, 17)
+    estacionCamion = (3, 14)
+    salidaCamionTec = (1, 17)
 
     def __init__(self, schedule, model):
         self.mesagrid = MultiGrid(self.MAP_WIDTH, self.MAP_HEIGHT, False)
@@ -87,7 +89,7 @@ class MapaTec():
 
     def asignar_celda(self, contenido, y, x):
         x_pos = x
-        # Mesa empieza (0, 0) en la esquina inferior izquierda, se tiene que "traducir" la coordenada y
+        # Mesa empieza (0, 0) en la esquina inferior izquierda, se tiene que "traducir" la coordenada Y
         y_pos = self.MAP_HEIGHT - y - 1
 
         # Eliminar celdas previamente agregadas por default

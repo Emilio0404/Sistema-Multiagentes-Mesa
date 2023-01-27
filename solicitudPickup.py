@@ -1,6 +1,5 @@
 class SolicitudPickup():
-  def __init__(self, idPersona, origenDeSolicitud, destino):
-    self.idPersona = idPersona
-    self.origenDeSolicitud = origenDeSolicitud
+  def __init__(self, agentePersona, origen, destino):
+    self.persona = agentePersona
+    self.origen = origen
     self.destino = destino
-    self.carro = None
