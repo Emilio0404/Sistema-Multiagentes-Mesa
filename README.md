@@ -2,9 +2,9 @@
 
 ## Dependencies
 
-- pip install Flask
-- pip install mesa
+- `pip install Flask`
+- `pip install mesa`
 
 ## Run
 
-- flask --app main run
+- `flask --app main run`
