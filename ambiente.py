@@ -83,7 +83,15 @@ class Ambiente(Model):
 
   
   def handle_Persona(self, agent):
-    return {"omg": agent.unique_id}
+    data = {
+          "idCarro" : agent.unique_id,
+          "horaDeIda" : agent.horaDeIda,
+          "horaDeRegreso" : agent.horaDeRegreso,
+          "status" : agent.estado.name,
+          "casa" : list(agent.coordenadasCasa)
+        }
+
+    return data
 
   def handle_Carro(self, agent):
     data = {

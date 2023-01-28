@@ -2,7 +2,7 @@ from flask import Flask
 from ambiente import Ambiente
 
 app = Flask(__name__)
-modelo = Ambiente(10, 100)
+modelo = Ambiente(100, 100)
 
 @app.route('/', methods=["GET"])
 def get_model():
