@@ -1,6 +1,6 @@
 def main():
     from ambiente import Ambiente
-    modelo = Ambiente(50, 50)
+    modelo = Ambiente(10, 10)
 
     # Para representar intervalos de 15 minutos se multiplica las 24 horas por 4
     for i in range(0, 24 * 4):

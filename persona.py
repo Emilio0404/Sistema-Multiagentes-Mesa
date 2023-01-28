@@ -14,6 +14,8 @@ class Persona(Agent):
     self.estado = Persona.estados.en_pausa
     self.coordenadasCasa = coordenadasCasa
     self.solicitudActual = None
+    self.origen = None
+    self.destino = None
 
 
   def stage_1(self):
@@ -53,12 +55,12 @@ class Persona(Agent):
 
   def pedir_pickup(self):
     if self.model.horaActual == self.horaDeIda:
-      origen = self.coordenadasCasa
-      destino = self.model.grid.coordenadasTec
+      self.origen = self.coordenadasCasa
+      self.destino = self.model.grid.coordenadasTec
     else:
-      origen = self.model.grid.coordenadasTec
-      destino = self.coordenadasCasa
-    self.solicitudActual = SolicitudPickup(self, origen, destino)
+      self.origen = self.model.grid.coordenadasTec
+      self.destino = self.coordenadasCasa
+    self.solicitudActual = SolicitudPickup(self, self.origen, self.destino)
     self.model.solicitudesCarpool.append(self.solicitudActual)
 
 
@@ -80,9 +82,9 @@ class Persona(Agent):
   def moverse_a_camion(self):
     print("  MOVIMIENTO: Soy Persona con id", self.unique_id, "y voy al camion")
     if self.model.horaActual == self.horaDeIda:
-      self.grid.mesagrid.move_agent(self, self.grid.estacionCamion)
+      self.model.grid.mesagrid.move_agent(self, self.model.grid.estacionCamion)
     elif self.model.horaActual == self.horaDeRegreso:
-      self.grid.mesagrid.move_agent(self, self.grid.salidaCamionTec)
+      self.model.grid.mesagrid.move_agent(self, self.model.grid.salidaCamionTec)
 
 
   def setEstado(self, nuevoEstado):

@@ -17,7 +17,7 @@ class Ambiente(Model):
     self.solicitudesCarpool = []
     self.horaActual = 0
     self.schedule = StagedActivation(self, ["stage_1", "stage_2", "stage_3"])
-    self.grid = MapaTec(self.schedule, self)
+    self.grid = MapaTec(self.schedule, self)   
     self.crear_carros()
     self.crear_personas()
     self.crear_autobus()
@@ -32,20 +32,25 @@ class Ambiente(Model):
   def crear_carros(self):
     for i in range(0, self.numCarros):
       horarios = self.generar_horarios_movimiento()
-      tmpAgent = Carro("Carro" + str(i), self, horarios[0], horarios[1], choice(self.grid.casas))
+      origen = choice(self.grid.casas)
+      tmpAgent = Carro("Carro" + str(i), self, horarios[0], horarios[1], origen)
       self.schedule.add(tmpAgent)
+      self.grid.mesagrid.place_agent(tmpAgent, origen)
 
 
   def crear_personas(self):
     for i in range(0, self.numPersonas):
       horarios = self.generar_horarios_movimiento()
-      tmpAgent = Persona("Persona" + str(i), self, horarios[0], horarios[1], choice(self.grid.casas))
+      origen = choice(self.grid.casas)
+      tmpAgent = Persona("Persona" + str(i), self, horarios[0], horarios[1], origen)
       self.schedule.add(tmpAgent)
+      self.grid.mesagrid.place_agent(tmpAgent, origen)
 
   
   def crear_autobus(self):
       tmpAgent = Autobus("Autobus" + str(1), self)
       self.schedule.add(tmpAgent)
+      self.grid.mesagrid.place_agent(tmpAgent, self.grid.estacionCamion)
 
 
   def generar_horarios_movimiento(self):

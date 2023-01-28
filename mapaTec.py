@@ -5,17 +5,18 @@ from enum import Enum
 class MapaTec():
     MAP_WIDTH = 20
     MAP_HEIGHT = 22
+    # Las siguientes coordenadas estan en formato de MESA
     casas = [
-            (1, 0), (6, 0), (7, 0), (14, 0), (20, 0), (1, 3),
-            (2, 3), (7, 3), (20, 3), (13, 12), (16, 12), (16, 15),
-            (16, 18), (16 , 19), (19, 18), (20, 18), (21, 18)
+            (0, 1), (0, 7), (0, 14), (0, 15), (0, 18), (3, 1), (3, 14),
+            (3, 19), (3, 20), (12, 5), (12, 8), (18, 0), (18, 1), (18, 2),
+            (18, 5), (19, 5), (15, 5)
         ]
     edificios = [
-            (17, 6), (19, 6), (21, 12), (21, 15)
+            (6, 2), (6, 4), (12, 0), (15, 0)
         ]
-    coordenadasTec = (1, 17)
-    estacionCamion = (3, 14)
-    salidaCamionTec = (1, 17)
+    coordenadasTec = (17, 20)
+    estacionCamion = (3, 7)
+    salidaCamionTec = (17, 20)
 
     def __init__(self, schedule, model):
         self.mesagrid = MultiGrid(self.MAP_WIDTH, self.MAP_HEIGHT, False)
@@ -39,11 +40,19 @@ class MapaTec():
 
 
     def llenar_casas(self):
-        for casa in self.casas:
+        casas = [
+            (1, 0), (6, 0), (7, 0), (14, 0), (20, 0), (1, 3),
+            (2, 3), (7, 3), (20, 3), (13, 12), (16, 12), (16, 15),
+            (16, 18), (16 , 19), (19, 18), (20, 18), (21, 18)
+        ]
+        for casa in casas:
             self.asignar_celda(2, casa[0], casa[1])
 
     def llenar_edificios(self):
-        for edificio in self.edificios:
+        edificios = [
+            (17, 6), (19, 6), (21, 12), (21, 15)
+        ]
+        for edificio in edificios:
             self.asignar_celda(4, edificio[0], edificio[1])
 
     

@@ -1,5 +1,6 @@
 from mesa import Agent
 from enum import Enum
+from pathGenerator import PathGenerator
 
 class Carro(Agent):
   estados = Enum('Estados_Carro', ['estacionado', 'frenado', 'pickup_en_progreso', 'en_transito'])
@@ -40,7 +41,8 @@ class Carro(Agent):
         tempPasajeros.append(solicitud.persona.unique_id)
       print("    Voy a llevar a", tempPasajeros)
 
-      self.generar_ruta()
+      self.ruta = self.generar_ruta()
+      print(self.coordenadasCasa, self.ruta)
 
 
   def stage_3(self):
@@ -49,42 +51,137 @@ class Carro(Agent):
 
     # Llego a su destino
     self.estado = Carro.estados.estacionado
+    for solicitud in self.solicitudesAceptadas:
+      if self.destino == self.model.grid.coordenadasTec:
+        # TODO: Mover agentes
+        self.origen = self.model.grid.coordenadasTec
+        self.destino = self.coordenadasCasa
+        solicitud.persona.origen = self.model.grid.coordenadasTec
+        solicitud.persona.destino = solicitud.persona.coordenadasCasa
+      solicitud.persona.setEstado("en_pausa")
+      solicitud.persona.solicitudActual = None
     self.solicitudesAceptadas = []
     self.asientosOcupados = 1
+    self.ruta = []
 
 
   def aceptar_solicitudes(self):
-    # Desde punto de origen hacia el Tec
     if self.destino == self.model.grid.coordenadasTec:
-      for solicitud in self.model.solicitudesCarpool:
-        if not self.hay_espacio_en_carro():
-          break
-
-        # Criterio de seleccion para las rutas
-        if solicitud.destino == self.model.grid.coordenadasTec:
-          self.solicitudesAceptadas.append(solicitud)
-          self.asientosOcupados += 1
-          self.model.solicitudesCarpool.remove(solicitud)
-          solicitud.persona.setEstado("esperando_pickup")
-
-
+      # Desde punto de origen hacia el Tec
+      self.aceptar_solicitudes_cuadrante()
     elif self.origen == self.model.grid.coordenadasTec:
-      for solicitud in self.model.solicitudesCarpool:
+      # Desde el Tec hacia las casas
+      self.aceptar_solicitudes_en_tec()
+    
+
+  def aceptar_solicitudes_cuadrante(self):
+    cuadranteCarro = self.getCuadrante(self.pos)
+    for solicitud in self.model.solicitudesCarpool:
         if not self.hay_espacio_en_carro():
           break
+        if solicitud.destino == self.model.grid.coordenadasTec and cuadranteCarro == self.getCuadrante(solicitud.origen):
+          self.aceptar_solicitud(solicitud)
 
-        # Criterio de seleccion para las rutas
+
+  def aceptar_solicitudes_en_tec(self):
+    for solicitud in self.model.solicitudesCarpool:
+        if not self.hay_espacio_en_carro():
+          break
         if solicitud.origen == self.model.grid.coordenadasTec:
-          self.solicitudesAceptadas.append(solicitud)
-          self.asientosOcupados += 1
-          self.model.solicitudesCarpool.remove(solicitud)
-          solicitud.persona.setEstado("esperando_pickup")
-      
+          self.aceptar_solicitud(solicitud)
+          
+
+  def aceptar_solicitud(self, solicitud):
+    self.solicitudesAceptadas.append(solicitud)
+    self.asientosOcupados += 1
+    self.model.solicitudesCarpool.remove(solicitud)
+    solicitud.persona.setEstado("esperando_pickup")
+
 
   def generar_ruta(self):
-    # Agregar pasajeros actuales a la ruta
-    # Interpolar ruta entre esos puntos
-    pass
+    ruta = []
+
+    if self.destino == self.model.grid.coordenadasTec:
+      
+      # Generar rutas desde poisicion original hacia otros pasajeros desde origen
+      origen_mini_ruta = self.origen
+      for solicitud in self.solicitudesAceptadas:
+        ruta += self.crear_ruta(origen_mini_ruta, solicitud.origen)
+        origen_mini_ruta = solicitud.origen
+
+      # Escoger ruta predefinida desde cuadrante hacia rotonda
+      cuadrante = self.getCuadrante(self.pos)
+      if cuadrante == 1 or cuadrante == 2:
+        calle_izquierda_hacia_Tec = [
+          (1, 9), (2, 9), (3, 9), (4, 9), (5, 9), (6, 9), (7, 9), (8, 9), (9, 9), (10, 9), (11, 9),
+          (11, 10), (11, 11), (11, 12)
+        ]
+
+        # Agregar coordenadas de ultimo pasajero a inicio de ruta final
+        ruta += self.crear_ruta(origen_mini_ruta, calle_izquierda_hacia_Tec[0])
+
+        # Agregar desde calle hasta el centro de la rotonda
+        ruta += calle_izquierda_hacia_Tec[1:]
+
+      elif cuadrante == 3:
+        calle_derecha_hacia_Tec = [
+          (14, 12), (13, 12), (12, 12), (11, 12)
+        ]
+
+        # Agregar coordenadas de ultimo pasajero a inicio de ruta final
+        ruta += self.crear_ruta(origen_mini_ruta, calle_derecha_hacia_Tec[0])
+
+        # Agregar desde calle hasta el centro de la rotonda
+        ruta += calle_derecha_hacia_Tec[1:]
+
+      # Agregar waypoints desde rotonda hacia tec
+      despues_rotonda_hacia_Tec = [
+        (11, 13), (11, 14), (11, 15), (11, 16), (11, 17), (11, 18), (11, 19), (11, 20),
+        (12, 20), (13, 20), (14, 20), (15, 20), (16, 20), (17, 20)
+      ]
+      ruta += despues_rotonda_hacia_Tec
+    
+    return ruta
+
+
+  def getCuadrante(self, posicion):
+    # Izquierda superior = 1
+    # Izquierda inferior = 2
+    # Derecha inferior = 3
+    # Derecha superior = 4
+    x = posicion[0]
+    y = posicion[1]
+
+    if x < 8 and y > 12:
+      return 1
+    elif x < 8 and y < 9:
+      return 2
+    elif x > 11 and y < 9: 
+      return 3
+    elif x > 11 and y > 12:
+      return 4
+
+    return -1 # Fuera de los cuadrantes 
+
 
   def hay_espacio_en_carro(self):
     return len(self.solicitudesAceptadas) < 4
+
+
+  def crear_ruta(self, desde, hacia):
+    # Valores especiales para no confundir las otras casas
+    self.model.grid.mesagrid[desde[0]][desde[1]][0].contenido = 100
+    self.model.grid.mesagrid[hacia[0]][hacia[1]][0].contenido = 100
+
+    camino = PathGenerator(self.model.grid.mesagrid, list(desde), list(hacia),
+                           self.model.grid.MAP_WIDTH,
+                           self.model.grid.MAP_HEIGHT).return_path()
+
+    # Regresar valores originales
+    self.model.grid.mesagrid[desde[0]][desde[1]][0].contenido = 2
+    self.model.grid.mesagrid[hacia[0]][hacia[1]][0].contenido = 2
+
+    return camino
+
+
+  
