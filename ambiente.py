@@ -62,7 +62,9 @@ class Ambiente(Model):
 
   def mandar_json_a_unity(self):
     json = {
-      "Ambiente" : {"horaActual" : self.horaActual},
+      "Ambiente" : {"horaActual" : self.horaActual,
+                    "numeroCarros" : self.numCarros,
+                    "numeroPersonas" : self.numPersonas},
       "Carros" : [],
       "Personas" : [],
       "Autobus" : {}
@@ -100,7 +102,7 @@ class Ambiente(Model):
       "horaDeRegreso" : agent.horaDeRegreso,
       "status" : agent.estado.name,
       "ruta" : agent.ruta,
-      "pasajeros" : agent.get_ids_pasajeros()
+      "pasajeros" : agent.get_datos_pasajeros()
     }
     print(agent.ruta)
 

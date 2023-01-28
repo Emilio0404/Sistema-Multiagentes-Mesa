@@ -187,10 +187,14 @@ class Carro(Agent):
     return camino
 
 
-  def get_ids_pasajeros(self):
+  def get_datos_pasajeros(self):
     pasajeros = []
     for solicitud in self.solicitudesAceptadas:
-      pasajeros.append(solicitud.persona.unique_id)
+      datos = {
+        "id" : solicitud.persona.unique_id,
+        "coordenadasCasa" : solicitud.persona.coordenadasCasa
+      }
+      pasajeros.append(datos)
     return pasajeros
 
 
