@@ -1,5 +1,6 @@
 from mesa import Model
 from mesa.time import StagedActivation
+from flask import jsonify
 
 from random import randint
 from random import choice
@@ -15,7 +16,7 @@ class Ambiente(Model):
     self.numPersonas = numPersonas
     self.numCarros = numCarros
     self.solicitudesCarpool = []
-    self.horaActual = 0
+    self.horaActual = 28 - 1
     self.schedule = StagedActivation(self, ["stage_1", "stage_2", "stage_3"])
     self.grid = MapaTec(self.schedule, self)   
     self.crear_carros()
@@ -24,9 +25,9 @@ class Ambiente(Model):
 
 
   def step(self):
-    self.schedule.step()
+    # Cada step representa 15 minutos
     self.horaActual += 1
-    self.mandar_json_a_unity()
+    self.schedule.step()
 
 
   def crear_carros(self):
@@ -60,5 +61,42 @@ class Ambiente(Model):
 
 
   def mandar_json_a_unity(self):
-    # Falta implementación
-    pass
+    json = {
+      "Ambiente" : {"horaActual" : self.horaActual},
+      "Carros" : [],
+      "Personas" : [],
+      "Autobus" : {}
+    }
+
+    for agent in self.schedule.agents:
+      if isinstance(agent, Persona):
+        datosPersona = self.handle_Persona(agent)
+        json["Personas"].append(datosPersona)
+      elif isinstance(agent, Carro):
+        datosCarro = self.handle_Carro(agent)
+        json["Carros"].append(datosCarro)
+      elif isinstance(agent, Autobus):
+        datosAutobus = self.handle_Autobus(agent)
+        json["Autobus"] = datosAutobus
+
+    return jsonify(json)
+
+  
+  def handle_Persona(self, agent):
+    return {"omg": agent.unique_id}
+
+  def handle_Carro(self, agent):
+    data = {
+      "idCarro" : agent.unique_id,
+      "horaDeIda" : agent.horaDeIda,
+      "horaDeRegreso" : agent.horaDeRegreso,
+      "status" : agent.estado.name,
+      "ruta" : agent.ruta,
+      "pasajeros" : agent.get_ids_pasajeros()
+    }
+    print(agent.ruta)
+
+    return data
+
+  def handle_Autobus(self, agent):
+    return {"omg": agent.unique_id}

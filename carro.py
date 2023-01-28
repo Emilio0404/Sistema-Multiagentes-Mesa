@@ -19,6 +19,22 @@ class Carro(Agent):
 
 
   def stage_1(self):
+    # Llego a su destino
+    self.estado = Carro.estados.estacionado
+    for solicitud in self.solicitudesAceptadas:
+      if self.destino == self.model.grid.coordenadasTec:
+        # TODO: Mover agentes
+        self.origen = self.model.grid.coordenadasTec
+        self.destino = self.coordenadasCasa
+        solicitud.persona.origen = self.model.grid.coordenadasTec
+        solicitud.persona.destino = solicitud.persona.coordenadasCasa
+      solicitud.persona.setEstado("en_pausa")
+      solicitud.persona.solicitudActual = None
+      self.ruta = []
+      self.solicitudesAceptadas = []
+      self.asientosOcupados = 1
+
+
     if self.estado == Carro.estados.estacionado:
       if self.horaDeIda == self.model.horaActual:
         self.estado = Carro.estados.en_transito
@@ -47,22 +63,9 @@ class Carro(Agent):
 
   def stage_3(self):
     # Ir por personas
+    # TODO: mover agentes
     # Marcar como recogidas
-
-    # Llego a su destino
-    self.estado = Carro.estados.estacionado
-    for solicitud in self.solicitudesAceptadas:
-      if self.destino == self.model.grid.coordenadasTec:
-        # TODO: Mover agentes
-        self.origen = self.model.grid.coordenadasTec
-        self.destino = self.coordenadasCasa
-        solicitud.persona.origen = self.model.grid.coordenadasTec
-        solicitud.persona.destino = solicitud.persona.coordenadasCasa
-      solicitud.persona.setEstado("en_pausa")
-      solicitud.persona.solicitudActual = None
-    self.solicitudesAceptadas = []
-    self.asientosOcupados = 1
-    self.ruta = []
+    pass
 
 
   def aceptar_solicitudes(self):
@@ -182,6 +185,13 @@ class Carro(Agent):
     self.model.grid.mesagrid[hacia[0]][hacia[1]][0].contenido = 2
 
     return camino
+
+
+  def get_ids_pasajeros(self):
+    pasajeros = []
+    for solicitud in self.solicitudesAceptadas:
+      pasajeros.append(solicitud.persona.unique_id)
+    return pasajeros
 
 
   

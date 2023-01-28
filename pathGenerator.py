@@ -1,3 +1,6 @@
+# Algoritmo obtenido de: https://www.geeksforgeeks.org/find-whether-path-two-cells-matrix/
+
+
 class PathGenerator():
     def __init__(self, matriz, origen, destino, altura, largo):
         self.matriz = matriz

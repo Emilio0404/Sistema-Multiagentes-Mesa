@@ -1,3 +1,16 @@
+from flask import Flask
+from ambiente import Ambiente
+
+app = Flask(__name__)
+modelo = Ambiente(10, 100)
+
+@app.route('/', methods=["GET"])
+def get_model():
+    modelo.step()
+    return modelo.mandar_json_a_unity()
+
+
+"""
 def main():
     from ambiente import Ambiente
     modelo = Ambiente(10, 10)
@@ -11,3 +24,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+"""
