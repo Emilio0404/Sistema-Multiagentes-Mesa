@@ -103,6 +103,7 @@ class Carro(Agent):
 
   def generar_ruta(self):
     ruta = []
+    cuadrante = self.getCuadrante(self.pos)
 
     if self.destino == self.model.grid.coordenadasTec:
       
@@ -113,7 +114,6 @@ class Carro(Agent):
         origen_mini_ruta = solicitud.origen
 
       # Escoger ruta predefinida desde cuadrante hacia rotonda
-      cuadrante = self.getCuadrante(self.pos)
       if cuadrante == 1 or cuadrante == 2:
         calle_izquierda_hacia_Tec = [
           (1, 9), (2, 9), (3, 9), (4, 9), (5, 9), (6, 9), (7, 9), (8, 9), (9, 9), (10, 9), (11, 9),
@@ -143,6 +143,37 @@ class Carro(Agent):
         (12, 20), (13, 20), (14, 20), (15, 20), (16, 20), (17, 20)
       ]
       ruta += despues_rotonda_hacia_Tec
+
+    else:
+      desde_tec_hacia_rotonda = [
+        (17, 20), (16, 20), (15, 20), (14, 20), (13, 20), (12, 20), (11, 20), (10, 20), (9, 20), (8, 20),
+        (8, 19), (8, 18), (8, 17), (8, 18), (8, 17), (8, 16), (8, 15), (8, 14), (8, 13), (8, 12)
+      ]
+      ruta += desde_tec_hacia_rotonda
+
+      if cuadrante == 1:
+        desde_tec_hacia_cuadrante1 = [
+          (7, 12), (6, 12), (5, 12), (4, 12), (3, 12), (2, 12), (3, 13)
+        ]
+        ruta += desde_tec_hacia_cuadrante1
+      elif cuadrante == 2:
+        desde_tec_hacia_cuadrante2 = [
+          (7, 12), (6, 12), (5, 12), (4, 12), (3, 12), (2, 12), (1, 12),
+          (1, 11), (1, 10), (1, 9), (1, 8), (1, 8)
+        ]
+        ruta += desde_tec_hacia_cuadrante2
+      elif cuadrante == 3:
+        desde_tec_hacia_cuadrante3 = [
+          (8, 11), (8, 10), (8, 9), (9, 9), (10, 9), (11, 9), (12, 9), (13, 9), (13, 8)
+        ]
+        ruta += desde_tec_hacia_cuadrante3
+
+      # Generar rutas desde inicio de cuadrante a las casas de los pasajeros
+      origen_mini_ruta = ruta[-1]
+      for solicitud in self.solicitudesAceptadas:
+        ruta += self.crear_ruta(origen_mini_ruta, solicitud.coordenadasCasa)
+        origen_mini_ruta = solicitud.coordenadasCasa
+      ruta += self.crear_ruta(origen_mini_ruta, self.coordenadasCasa)
     
     return ruta
 
@@ -196,6 +227,3 @@ class Carro(Agent):
       }
       pasajeros.append(datos)
     return pasajeros
-
-
-  

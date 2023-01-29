@@ -1,4 +1,4 @@
-# Algoritmo obtenido de: https://www.geeksforgeeks.org/find-whether-path-two-cells-matrix/
+# Algoritmo adaptado de: https://www.geeksforgeeks.org/find-whether-path-two-cells-matrix/
 
 
 class PathGenerator():
@@ -16,8 +16,8 @@ class PathGenerator():
             return self.camino
 
     def get_path(self):
-        visitados = [[False for x in range(self.largo)]
-               for y in range(self.altura)]
+        visitados = [[False for _ in range(self.largo)]
+               for _ in range(self.altura)]
     
         for i in range(self.altura):
             for j in range(self.largo):
