@@ -64,8 +64,13 @@ class Carro(Agent):
   def stage_3(self):
     # Ir por personas
     # TODO: mover agentes
+
+    if self.horaDeIda == self.model.horaActual:
+      self.model.grid.mesagrid.move_agent(self, self.model.grid.coordenadasTec) 
+    elif self.horaDeRegreso == self.model.horaActual:
+      self.model.grid.mesagrid.move_agent(self, self.coordenadasCasa)
+
     # Marcar como recogidas
-    pass
 
 
   def aceptar_solicitudes(self):
@@ -78,19 +83,20 @@ class Carro(Agent):
     
 
   def aceptar_solicitudes_cuadrante(self):
-    cuadranteCarro = self.getCuadrante(self.pos)
+    cuadranteCarro = self.get_cuadrante(self.pos)
     for solicitud in self.model.solicitudesCarpool:
         if not self.hay_espacio_en_carro():
           break
-        if solicitud.destino == self.model.grid.coordenadasTec and cuadranteCarro == self.getCuadrante(solicitud.origen):
+        if solicitud.destino == self.model.grid.coordenadasTec and cuadranteCarro == self.get_cuadrante(solicitud.origen):
           self.aceptar_solicitud(solicitud)
 
 
   def aceptar_solicitudes_en_tec(self):
+    cuadranteCarro = self.get_cuadrante(self.coordenadasCasa)
     for solicitud in self.model.solicitudesCarpool:
         if not self.hay_espacio_en_carro():
           break
-        if solicitud.origen == self.model.grid.coordenadasTec:
+        if solicitud.origen == self.model.grid.coordenadasTec and self.get_cuadrante(solicitud.destino) == cuadranteCarro:
           self.aceptar_solicitud(solicitud)
           
 
@@ -103,10 +109,8 @@ class Carro(Agent):
 
   def generar_ruta(self):
     ruta = []
-    cuadrante = self.getCuadrante(self.pos)
-
     if self.destino == self.model.grid.coordenadasTec:
-      
+      cuadrante = self.get_cuadrante(self.pos)
       # Generar rutas desde poisicion original hacia otros pasajeros desde origen
       origen_mini_ruta = self.origen
       for solicitud in self.solicitudesAceptadas:
@@ -145,21 +149,22 @@ class Carro(Agent):
       ruta += despues_rotonda_hacia_Tec
 
     else:
+      cuadrante = self.get_cuadrante(self.coordenadasCasa)
       desde_tec_hacia_rotonda = [
         (17, 20), (16, 20), (15, 20), (14, 20), (13, 20), (12, 20), (11, 20), (10, 20), (9, 20), (8, 20),
-        (8, 19), (8, 18), (8, 17), (8, 18), (8, 17), (8, 16), (8, 15), (8, 14), (8, 13), (8, 12)
+        (8, 19), (8, 18), (8, 17), (8, 16), (8, 15), (8, 14), (8, 13), (8, 12)
       ]
       ruta += desde_tec_hacia_rotonda
 
       if cuadrante == 1:
         desde_tec_hacia_cuadrante1 = [
-          (7, 12), (6, 12), (5, 12), (4, 12), (3, 12), (2, 12), (3, 13)
+          (7, 12), (6, 12), (5, 12), (4, 12), (3, 12), (2, 12), (2, 13)
         ]
         ruta += desde_tec_hacia_cuadrante1
       elif cuadrante == 2:
         desde_tec_hacia_cuadrante2 = [
           (7, 12), (6, 12), (5, 12), (4, 12), (3, 12), (2, 12), (1, 12),
-          (1, 11), (1, 10), (1, 9), (1, 8), (1, 8)
+          (1, 11), (1, 10), (1, 9), (1, 8)
         ]
         ruta += desde_tec_hacia_cuadrante2
       elif cuadrante == 3:
@@ -171,14 +176,14 @@ class Carro(Agent):
       # Generar rutas desde inicio de cuadrante a las casas de los pasajeros
       origen_mini_ruta = ruta[-1]
       for solicitud in self.solicitudesAceptadas:
-        ruta += self.crear_ruta(origen_mini_ruta, solicitud.coordenadasCasa)
-        origen_mini_ruta = solicitud.coordenadasCasa
+        ruta += self.crear_ruta(origen_mini_ruta, solicitud.persona.coordenadasCasa)
+        origen_mini_ruta = solicitud.persona.coordenadasCasa
       ruta += self.crear_ruta(origen_mini_ruta, self.coordenadasCasa)
     
     return ruta
 
 
-  def getCuadrante(self, posicion):
+  def get_cuadrante(self, posicion):
     # Izquierda superior = 1
     # Izquierda inferior = 2
     # Derecha inferior = 3

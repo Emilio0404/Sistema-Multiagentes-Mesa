@@ -65,7 +65,7 @@ class Persona(Agent):
 
 
   def hay_disponibilidad_camion(self):
-    # Checar si camion sale en menos de 30 minutos y si Persona llega al camion a tiempo
+    # Checar si camion sale en menos de 30 minutos
     if self.model.horaActual == self.horaDeIda:
       for horario in Autobus.horariosDeSalida:
         if horario <= (self.horaDeIda + 2) and horario >= self.horaDeIda:

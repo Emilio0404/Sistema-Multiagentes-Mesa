@@ -1,6 +1,7 @@
 from flask import Flask
 from ambiente import Ambiente
 
+
 app = Flask(__name__)
 modelo = Ambiente(100, 100)
 
@@ -10,10 +11,9 @@ def get_model():
     return modelo.mandar_json_a_unity()
 
 
-"""
 def main():
     from ambiente import Ambiente
-    modelo = Ambiente(10, 10)
+    modelo = Ambiente(100, 100)
 
     # Para representar intervalos de 15 minutos se multiplica las 24 horas por 4
     for i in range(0, 24 * 4):
@@ -24,4 +24,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""
