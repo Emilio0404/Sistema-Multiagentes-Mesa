@@ -81,17 +81,19 @@ class Persona(Agent):
 
   def moverse_a_camion(self):
     print("  MOVIMIENTO: Soy Persona con id", self.unique_id, "y voy al camion")
+    self.model.camion.aceptar_pasajero(self)
     if self.model.horaActual == self.horaDeIda:
       self.model.grid.mesagrid.move_agent(self, self.model.grid.estacionCamion)
     elif self.model.horaActual == self.horaDeRegreso:
       self.model.grid.mesagrid.move_agent(self, self.model.grid.salidaCamionTec)
+    
 
 
   def setEstado(self, nuevoEstado):
     if nuevoEstado in Persona.estados._member_names_:
       self.estado = Persona.estados[nuevoEstado]
     else:
-      raise TypeError(nuevoEstado + " no es un estado valido")
+      raise TypeError("No es un estado valido")
 
 
   def eliminar_solicitud_carpool(self):

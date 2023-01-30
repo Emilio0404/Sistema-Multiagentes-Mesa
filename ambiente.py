@@ -19,6 +19,7 @@ class Ambiente(Model):
     self.horaActual = 28 - 1
     self.schedule = StagedActivation(self, ["stage_1", "stage_2", "stage_3"])
     self.grid = MapaTec(self.schedule, self)   
+    self.camion = None
     self.crear_carros()
     self.crear_personas()
     self.crear_autobus()
@@ -50,6 +51,7 @@ class Ambiente(Model):
   
   def crear_autobus(self):
       tmpAgent = Autobus("Autobus" + str(1), self)
+      self.camion = tmpAgent
       self.schedule.add(tmpAgent)
       self.grid.mesagrid.place_agent(tmpAgent, self.grid.estacionCamion)
 
@@ -104,9 +106,14 @@ class Ambiente(Model):
       "ruta" : agent.ruta,
       "pasajeros" : agent.get_datos_pasajeros()
     }
-    print(agent.ruta)
 
     return data
 
   def handle_Autobus(self, agent):
-    return {"omg": agent.unique_id}
+    data = {
+      "idAutobus" : agent.unique_id,
+      "estado" : agent.estado.name,
+      "ruta" : agent.rutaActual,
+      "pasajeros" : agent.get_datos_pasajeros()
+    }
+    return data

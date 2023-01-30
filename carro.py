@@ -51,14 +51,12 @@ class Carro(Agent):
   def stage_2(self):
     if self.estado == Carro.estados.en_transito:
       self.aceptar_solicitudes()
+      self.ruta = self.generar_ruta()
 
       tempPasajeros = []
       for solicitud in self.solicitudesAceptadas:
         tempPasajeros.append(solicitud.persona.unique_id)
       print("    Voy a llevar a", tempPasajeros)
-
-      self.ruta = self.generar_ruta()
-      print(self.coordenadasCasa, self.ruta)
 
 
   def stage_3(self):
