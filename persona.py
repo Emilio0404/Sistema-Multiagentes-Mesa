@@ -27,6 +27,7 @@ class Persona(Agent):
         self.estado = Persona.estados.decidiendo
         print("  SOLICITUD: Soy Persona con id", self.unique_id, "y quiero regresar a mi casa")
 
+    # Solo se genera una nueva solicitud en caso de que non haya una del step pasado
     if self.estado == Persona.estados.decidiendo and self.solicitudActual is None:
       self.pedir_pickup()
        
@@ -87,7 +88,6 @@ class Persona(Agent):
     elif self.model.horaActual == self.horaDeRegreso:
       self.model.grid.mesagrid.move_agent(self, self.model.grid.salidaCamionTec)
     
-
 
   def setEstado(self, nuevoEstado):
     if nuevoEstado in Persona.estados._member_names_:
