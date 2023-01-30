@@ -3,7 +3,7 @@ from enum import Enum
 from pathGenerator import PathGenerator
 
 class Carro(Agent):
-  estados = Enum('Estados_Carro', ['estacionado', 'frenado', 'pickup_en_progreso', 'en_transito'])
+  estados = Enum('Estados_Carro', ['estacionado', 'pickup_en_progreso', 'en_transito'])
 
   def __init__(self, unique_id, model, horaDeIda, horaDeRegreso, coordenadasCasa):
     super().__init__(unique_id, model)
@@ -40,12 +40,12 @@ class Carro(Agent):
         self.estado = Carro.estados.en_transito
         self.origen = self.coordenadasCasa
         self.destino = self.model.grid.coordenadasTec
-        print("  RUTA: Soy Carro con id", self.unique_id, "y voy hacia el Tec")
+        print("  RUTA DISPONIBLE: Soy Carro con id", self.unique_id, "y voy hacia el Tec")
       elif self.horaDeRegreso == self.model.horaActual:
         self.estado = Carro.estados.en_transito
         self.origen = self.model.grid.coordenadasTec
         self.destino = self.coordenadasCasa
-        print("  RUTA: Soy Carro con id", self.unique_id, "y voy de regreso a mi casa")
+        print("  RUTA DISPONIBLE: Soy Carro con id", self.unique_id, "y voy de regreso a mi casa")
 
 
   def stage_2(self):
@@ -56,17 +56,30 @@ class Carro(Agent):
       tempPasajeros = []
       for solicitud in self.solicitudesAceptadas:
         tempPasajeros.append(solicitud.persona.unique_id)
-      print("    Voy a llevar a", tempPasajeros)
+      print("   RUTA GENERADA: Soy carro", self.unique_id, " y voy a llevar a", tempPasajeros)
 
 
   def stage_3(self):
     # Ir por personas
-    # TODO: mover agentes
 
-    if self.horaDeIda == self.model.horaActual:
-      self.model.grid.mesagrid.move_agent(self, self.model.grid.coordenadasTec) 
-    elif self.horaDeRegreso == self.model.horaActual:
-      self.model.grid.mesagrid.move_agent(self, self.coordenadasCasa)
+    
+    # Solo mover a los agentes en la ruta si ya lo recogieron o si no lo han dejado en su casa
+    moverPasajeros = {}
+    for solicitud in self.solicitudesAceptadas:
+      if solicitud.destino == self.model.grid.coordenadasTec:
+        moverPasajeros[solicitud.persona.unique_id] = False
+      else:
+        moverPasajeros[solicitud.persona.unique_id] = True
+
+    # Mover agentes en el grid
+    for coordenada in self.ruta:
+      self.model.grid.mesagrid.move_agent(self, tuple(coordenada))
+      # Mover personas
+      for solicitud in self.solicitudesAceptadas:
+        if coordenada == solicitud.persona.coordenadasCasa:
+          moverPasajeros[solicitud.persona.unique_id] = not moverPasajeros[solicitud.persona.unique_id]
+        if moverPasajeros[solicitud.persona.unique_id] == True:
+          self.model.grid.mesagrid.move_agent(solicitud.persona, tuple(coordenada))
 
     # Marcar como recogidas
 
