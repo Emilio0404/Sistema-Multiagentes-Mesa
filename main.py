@@ -19,7 +19,7 @@ def main():
     for i in range(0, 24 * 4):
         hora = i // 4 if i // 4 >= 10 else "0" + str(i // 4)
         minutos = i * 15  % 60 if i * 15  % 60 > 10 else "0" + str(i * 15  % 60)
-        print(hora, ":", minutos, " ", i, sep="")
+        print(hora, ":", minutos, " ", "Iteración:", i, sep="")
         modelo.step()
 
 if __name__ == "__main__":
