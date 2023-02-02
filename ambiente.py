@@ -92,7 +92,7 @@ class Ambiente(Model):
           "horaDeIda" : agent.horaDeIda,
           "horaDeRegreso" : agent.horaDeRegreso,
           "status" : agent.estado.name,
-          "casa" : list(agent.coordenadasCasa)
+          "casa" : self.waypointize_coordinate(list(agent.coordenadasCasa))
         }
 
     return data
@@ -103,7 +103,7 @@ class Ambiente(Model):
       "horaDeIda" : agent.horaDeIda,
       "horaDeRegreso" : agent.horaDeRegreso,
       "status" : agent.estado.name,
-      "ruta" : agent.ruta,
+      "ruta" : self.waypointize_list(agent.ruta),
       "pasajeros" : agent.get_datos_pasajeros()
     }
 
@@ -113,7 +113,17 @@ class Ambiente(Model):
     data = {
       "idAutobus" : agent.unique_id,
       "estado" : agent.estado.name,
-      "ruta" : agent.rutaActual,
+      "ruta" : self.waypointize_list(agent.rutaActual),
       "pasajeros" : agent.get_datos_pasajeros()
     }
     return data
+
+  def waypointize_list(self, ruta):
+    waypoints = []
+    for coordenada in ruta:
+      waypoints.append("WP-" + str(coordenada[0]) + "," + str(coordenada[1]))
+    return waypoints
+  
+  def waypointize_coordinate(self, coordinate):
+    waypoint = "WP-" + str(coordinate[0]) + "," + str(coordinate[1])
+    return waypoint

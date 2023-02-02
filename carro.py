@@ -239,7 +239,11 @@ class Carro(Agent):
     for solicitud in self.solicitudesAceptadas:
       datos = {
         "id" : solicitud.persona.unique_id,
-        "coordenadasCasa" : solicitud.persona.coordenadasCasa
+        "coordenadasCasa" : self.waypointize_coordinate(solicitud.persona.coordenadasCasa)
       }
       pasajeros.append(datos)
     return pasajeros
+
+  def waypointize_coordinate(self, coordinate):
+    waypoint = "WP-" + str(coordinate[0]) + "," + str(coordinate[1])
+    return waypoint
